@@ -18,6 +18,7 @@
 package butter.droid.base.torrent;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -25,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.annotation.NonNull;
@@ -57,6 +59,8 @@ import timber.log.Timber;
 public class TorrentService extends Service implements TorrentServerListener {
 
     private static final Integer NOTIFICATION_ID = 3423423;
+    private static final String CHANNEL_ID = "torrent_service";
+    private static final String CHANNEL_NAME = "Torrent Service";
 
     private static TorrentService sThis;
 
@@ -90,6 +94,13 @@ public class TorrentService extends Service implements TorrentServerListener {
                 .build();
     }
 
+    private void createChannel(NotificationManager notificationManager) {
+        if (Build.VERSION.SDK_INT < 26) { return; }
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+        // channel.setDescription("Torrent service notifications.");
+        notificationManager.createNotificationChannel(channel);
+    } 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -100,6 +111,18 @@ public class TorrentService extends Service implements TorrentServerListener {
         mTorrentStreamServer.setServerPort(Constants.SERVER_PORT);
         mTorrentStreamServer.setTorrentOptions(getTorrentOptions());
         mTorrentStreamServer.startTorrentStream();
+
+        // HOTFIX android >= 26
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notif_logo)
+                .setContentTitle(getString(R.string.app_name) + " - " + getString(R.string.running))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE);
+        Notification notification = builder.build();
+        NotificationManager notifManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        this.createChannel(notifManager);
+        // notifManager.notify(NOTIFICATION_ID, notification);
+        super.startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
