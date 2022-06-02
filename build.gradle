@@ -13,6 +13,7 @@ buildscript {
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'com.github.dcendents:android-maven-plugin:1.2'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+        classpath 'io.sentry:sentry-android-gradle-plugin:1.7.36'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -21,21 +22,23 @@ buildscript {
 ext {
     compileSdk = 29
     targetSdk = 29
-    minSdk = 15
+    minSdk = 16
     appCompatVersion = '1.1.0'
     butterknifeVersion = "10.2.1"
     okHttpVersion = "3.4.2"
     picassoVersion = "2.71828"
-    torrentstreamServerVersion = "ab4439a90e49bf4e9682d4b4754922b6c506069c"
+    torrentstreamServerVersion = "file-fix-SNAPSHOT"
     daggerVersion = "2.7"
     javaxAnnotationVersion = "1.3.2"  
+    sentryDsn = ""
 }
 
 allprojects {
     repositories {
-        maven { url 'https://guardian.github.com/maven/repo-releases' }
         maven { url 'https://maven.google.com' }
         mavenCentral()
+        maven { url 'https://guardian.github.io/maven/repo-releases' }
+        maven { url 'https://maven.fabric.io/public' }
         maven { url 'https://jitpack.io' }
         jcenter()
         google()
